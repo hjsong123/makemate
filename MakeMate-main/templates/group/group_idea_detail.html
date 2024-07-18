@@ -1,0 +1,58 @@
+{% extends "base.html" %} 
+{% load static %} 
+{% block content %}
+{% now "Y-m-d H:i:s" as current_time %}
+<section>
+    <div class="wrap_title">
+      <a href="{% url 'group:group_detail' group_id=group.id %}" class="back_btn">back</a>
+      <h3 class="title_content">{{ group.title }}</h3> 
+      <div class="inner_title">
+        <div class="title_with_badge">
+          <div class="subtitle_content">{{ idea.title }}</div>
+        {% if group.second_end_date|date:"Y-m-d H:i:s" < current_time %}
+          {% if ideas_votes %} 
+            {% if idea.id == ideas_votes.idea_vote1_id %}
+              <span class="badge_idea_detail">1지망</span>
+            {% elif idea.id == ideas_votes.idea_vote2_id %}
+              <span class="badge_idea_detail">2지망</span>
+            {% elif idea.id == ideas_votes.idea_vote3_id %}
+              <span class="badge_idea_detail">3지망</span>
+            {% endif %} 
+          {% endif %}
+        {% else %}
+        {% if idea.id == ideas_votes.idea_vote1_id or idea.id == ideas_votes.idea_vote2_id or idea.id == ideas_votes.idea_vote3_id or idea.id == ideas_votes.idea_vote4_id or idea.id == ideas_votes.idea_vote5_id or idea.id == ideas_votes.idea_vote6_id or idea.id == ideas_votes.idea_vote7_id or idea.id == ideas_votes.idea_vote8_id or idea.id == ideas_votes.idea_vote9_id or idea.id == ideas_votes.idea_vote10_id %}
+          <span class="cta_blue_badge">선택</span>
+        {% endif %}
+        {% endif %}
+        </div>
+        <div class="inner_idea_intro">
+          <span>{{ idea.intro }}</span>
+        </div>
+        {% if idea.file %}
+          <div class="wrap_download">
+            <span class="download_content">발표자료 다운로드</span>
+            <form action="{% url 'idea:idea_download' group_id=group.id idea_id=idea.id %}" class="secondary_badge">
+              {% csrf_token %}
+              <button>다운로드</button>
+            </form>
+          </div>
+        {% endif %}
+        </div>
+        {% if idea.author == request.user %} 
+        <div class="idea_detail_modify_btns">
+          <form action="{% url 'idea:idea_delete' group_id=group.id idea_id=idea.id %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <button type="submit" class='cta_del_button'>삭제</button>
+          </form>
+          
+          <a href="{% url 'idea:idea_modify' group_id=group.id idea_id=idea.id %}" class="primary_button_fill">내용 수정</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="wrap_form">  
+        <div>{{ idea.content|linebreaks }}</div>      
+    </div>
+</section>
+
+{% endblock %}
